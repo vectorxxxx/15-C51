@@ -1,0 +1,90 @@
+#include <REGX52.H>
+#include "LCD1602.h"
+#include "Delay.h"
+
+// 练习四
+int Result;
+int i,j;
+void main()
+{
+	// 初始化
+	LCD_Init();
+	while(1)
+	{
+		for(i=1;i<10;i++)
+		{
+			for(j=1;j<10;j++)
+			{
+				Result=i*j;
+				LCD_ShowNum(1,1,i,2);
+				LCD_ShowChar(1,3,'x');
+				LCD_ShowNum(1,4,j,2);
+				LCD_ShowChar(1,6,'=');
+				LCD_ShowNum(1,7,Result,2);
+				Delay(1000);
+			}
+		}
+	}
+}
+
+// 练习三
+//int Result;
+//int i,j;
+//void main()
+//{
+//	// 初始化
+//	LCD_Init();
+//	while(1)
+//	{
+//		for(i=1;i<10;i++)
+//		{
+//			for(j=1;j<10;j++)
+//			{
+//				Result=i+j;
+//				LCD_ShowNum(1,1,i,2);
+//				LCD_ShowChar(1,3,'+');
+//				LCD_ShowNum(1,4,j,2);
+//				LCD_ShowChar(1,6,'=');
+//				LCD_ShowNum(1,7,Result,2);
+//				Delay(1000);
+//			}
+//		}
+//	}
+//}
+
+// 练习二 
+//int Result;
+//void main()
+//{
+//	// 初始化
+//	LCD_Init();
+//	while(1)
+//	{
+//		Result++;
+//		Delay(1000);
+//		LCD_ShowNum(1,1,Result,3);
+//	}
+//}
+
+// 练习一
+//void main()
+//{
+//	// 初始化
+//	LCD_Init();
+//	// 显示字符
+//	LCD_ShowChar(1,1,'A');
+//	// 显示字符串
+//	LCD_ShowString(1,3,"Hello");
+//	// 显示数字
+//	LCD_ShowNum(1,9,123,3);
+//	// 显示有符号数字
+//	LCD_ShowSignedNum(1,13,-66,2);
+//	// 显示16进制数字
+//	LCD_ShowHexNum(2,1,0xA8,2);
+//	// 显示2进制数字
+//	LCD_ShowBinNum(2,4,0xAA,8);
+
+//	while(1)
+//	{
+//	}
+//}

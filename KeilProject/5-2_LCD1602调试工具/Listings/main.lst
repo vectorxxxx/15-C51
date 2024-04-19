@@ -1,0 +1,116 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/19/2024 21:13:51 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "Delay.h"
+   4          
+   5          // 练习四
+   6          int Result;
+   7          int i,j;
+   8          void main()
+   9          {
+  10   1        // 初始化
+  11   1        LCD_Init();
+  12   1        while(1)
+  13   1        {
+  14   2          for(i=1;i<10;i++)
+  15   2          {
+  16   3            for(j=1;j<10;j++)
+  17   3            {
+  18   4              Result=i*j;
+  19   4              LCD_ShowNum(1,1,i,2);
+  20   4              LCD_ShowChar(1,3,'x');
+  21   4              LCD_ShowNum(1,4,j,2);
+  22   4              LCD_ShowChar(1,6,'=');
+  23   4              LCD_ShowNum(1,7,Result,2);
+  24   4              Delay(1000);
+  25   4            }
+  26   3          }
+  27   2        }
+  28   1      }
+  29          
+  30          // 练习三
+  31          //int Result;
+  32          //int i,j;
+  33          //void main()
+  34          //{
+  35          //  // 初始化
+  36          //  LCD_Init();
+  37          //  while(1)
+  38          //  {
+  39          //    for(i=1;i<10;i++)
+  40          //    {
+  41          //      for(j=1;j<10;j++)
+  42          //      {
+  43          //        Result=i+j;
+  44          //        LCD_ShowNum(1,1,i,2);
+  45          //        LCD_ShowChar(1,3,'+');
+  46          //        LCD_ShowNum(1,4,j,2);
+  47          //        LCD_ShowChar(1,6,'=');
+  48          //        LCD_ShowNum(1,7,Result,2);
+  49          //        Delay(1000);
+  50          //      }
+  51          //    }
+  52          //  }
+  53          //}
+  54          
+C51 COMPILER V9.60.7.0   MAIN                                                              04/19/2024 21:13:51 PAGE 2   
+
+  55          // 练习二 
+  56          //int Result;
+  57          //void main()
+  58          //{
+  59          //  // 初始化
+  60          //  LCD_Init();
+  61          //  while(1)
+  62          //  {
+  63          //    Result++;
+  64          //    Delay(1000);
+  65          //    LCD_ShowNum(1,1,Result,3);
+  66          //  }
+  67          //}
+  68          
+  69          // 练习一
+  70          //void main()
+  71          //{
+  72          //  // 初始化
+  73          //  LCD_Init();
+  74          //  // 显示字符
+  75          //  LCD_ShowChar(1,1,'A');
+  76          //  // 显示字符串
+  77          //  LCD_ShowString(1,3,"Hello");
+  78          //  // 显示数字
+  79          //  LCD_ShowNum(1,9,123,3);
+  80          //  // 显示有符号数字
+  81          //  LCD_ShowSignedNum(1,13,-66,2);
+  82          //  // 显示16进制数字
+  83          //  LCD_ShowHexNum(2,1,0xA8,2);
+  84          //  // 显示2进制数字
+  85          //  LCD_ShowBinNum(2,4,0xAA,8);
+  86          
+  87          //  while(1)
+  88          //  {
+  89          //  }
+  90          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    138    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
