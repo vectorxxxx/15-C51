@@ -1,4 +1,4 @@
-#include <REGX52.H>
+#include <REG52.H>
 #include "Timer0.h"
 #include "LCD1602.h"
 #include "DateTime.h"

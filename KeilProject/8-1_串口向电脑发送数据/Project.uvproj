@@ -233,7 +233,7 @@
               <RCB>
                 <Type>0</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0xffff</Size>
+                <Size>0x10000</Size>
               </RCB>
               <RXB>
                 <Type>0</Type>
@@ -348,7 +348,7 @@
             <DataOverlaying>1</DataOverlaying>
             <OverlayString></OverlayString>
             <MiscControls></MiscControls>
-            <DisableWarningNumbers>16</DisableWarningNumbers>
+            <DisableWarningNumbers></DisableWarningNumbers>
             <LinkerCmdFile></LinkerCmdFile>
             <Assign></Assign>
             <ReserveString></ReserveString>
@@ -382,16 +382,6 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>Timer0.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Timer0.h</FilePath>
-            </File>
-            <File>
-              <FileName>Timer0.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Timer0.c</FilePath>
-            </File>
-            <File>
               <FileName>Delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Delay.c</FilePath>
@@ -402,24 +392,14 @@
               <FilePath>.\Delay.h</FilePath>
             </File>
             <File>
-              <FileName>LCD1602.c</FileName>
+              <FileName>UART.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\LCD1602.c</FilePath>
+              <FilePath>.\UART.c</FilePath>
             </File>
             <File>
-              <FileName>LCD1602.h</FileName>
+              <FileName>UART.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\LCD1602.h</FilePath>
-            </File>
-            <File>
-              <FileName>DateTime.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\DateTime.c</FilePath>
-            </File>
-            <File>
-              <FileName>DateTime.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\DateTime.h</FilePath>
+              <FilePath>.\UART.h</FilePath>
             </File>
           </Files>
         </Group>
