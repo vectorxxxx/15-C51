@@ -431,6 +431,16 @@
               <FileType>5</FileType>
               <FilePath>.\PassWord.h</FilePath>
             </File>
+            <File>
+              <FileName>PassWordLock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\PassWordLock.c</FilePath>
+            </File>
+            <File>
+              <FileName>PassWordLock.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\PassWordLock.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
