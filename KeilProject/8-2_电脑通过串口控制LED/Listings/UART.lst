@@ -1,0 +1,83 @@
+C51 COMPILER V9.60.7.0   UART                                                              04/20/2024 23:19:21 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\Objects\UART.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE UART.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\UART.lst) OBJECT(.\Objects\UART.obj)
+
+line level    source
+
+   1          #include <STC89C5xRC.H>
+   2          
+   3          /**
+   4            * @brief 串口初始化，4800bps@11.0592MHz
+   5            * @param  无
+   6            * @retval 无
+   7            */
+   8          void UART_Init()
+   9          {
+  10   1              PCON |= 0x80;           //使能波特率倍速位SMOD
+  11   1              SCON = 0x50;            //8位数据,可变波特率
+  12   1      
+  13   1              TMOD &= 0x0F;           //设置定时器模式
+  14   1              TMOD |= 0x20;           //设置定时器模式
+  15   1      
+  16   1              TL1 = 0xF4;                     //设置定时初始值
+  17   1              TH1 = 0xF4;                     //设置定时重载值
+  18   1              ET1 = 0;                        //禁止定时器中断
+  19   1              TR1 = 1;                        //定时器1开始计时
+  20   1          
+  21   1          EA = 1;             //启用CPU总中断
+  22   1          ES = 1;             //启用串口中断
+  23   1      }
+  24          
+  25          /**
+  26            * @brief 串口向电脑发送字节数据
+  27            * @param  一个字节的Byte数据
+  28            * @retval 无
+  29            */
+  30          void UART_SendByte(unsigned int Byte)
+  31          {
+  32   1          SBUF=Byte;
+  33   1          while(TI==0);
+  34   1          TI=0;
+  35   1      }
+  36          
+  37          /*
+  38          void Int0_Routine(void)     interrupt 0;
+  39          void Timer0_Rountine(void)  interrupt 1;
+  40          void Int1_Routine(void)     interrupt 2;
+  41          void Timer1_Rountine(void)  interrupt 3:
+  42          void UART_Routine(void)     interrupt 4;
+  43          void Timer2_Routine(void)   interrupt 5;
+  44          void Int2_Routine(void)     interrupt 6;
+  45          void Int3_Routine(void)     interrupt 7;
+  46          
+  47          串口中断子函数模板
+  48          void UART_Routine(void)     interrupt 4
+  49          {
+  50              if(RI==1)
+  51              {
+  52                  // TODO
+  53                  
+  54                  RI=0;
+C51 COMPILER V9.60.7.0   UART                                                              04/20/2024 23:19:21 PAGE 2   
+
+  55              }
+  56          }
+  57          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     35    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
