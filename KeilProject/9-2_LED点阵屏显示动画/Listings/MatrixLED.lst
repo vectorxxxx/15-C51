@@ -1,0 +1,80 @@
+C51 COMPILER V9.60.7.0   MATRIXLED                                                         04/21/2024 15:56:28 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MATRIXLED
+OBJECT MODULE PLACED IN .\Objects\MatrixLED.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE MatrixLED.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.
+                    -\Listings\MatrixLED.lst) OBJECT(.\Objects\MatrixLED.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          
+   4          #define MARTIX_LED_PORT P0 // P00~P07
+   5          sbit RCK = P3^5; // RCLK
+   6          sbit SCK = P3^6; // SRCLK
+   7          sbit SER = P3^4; // SER
+   8          
+   9          /**
+  10            * @brief 点阵屏初始化
+  11            * @param  无
+  12            * @retval 无
+  13            */
+  14          void MatrixLED_Init()
+  15          {
+  16   1          SCK = 0;
+  17   1          RCK = 0;
+  18   1      }
+  19          
+  20          /**
+  21            * @brief 向74HC595发送一个字节
+  22            * @param  一个字节
+  23            * @retval 无
+  24            */
+  25          void _74HC595_SendByte(unsigned char Byte)
+  26          {
+  27   1          unsigned char i;
+  28   1          for(i=0;i<8;i++)
+  29   1          {
+  30   2              SER = Byte&(0x80>>i);
+  31   2              SCK = 1;
+  32   2              SCK = 0;
+  33   2          }
+  34   1          RCK = 1;
+  35   1          RCK = 0;
+  36   1      }
+  37          
+  38          /**
+  39            * @brief LED点阵屏显示一列数据
+  40            * @param  Column 8位段选，从左往右，范围0~7，默认为0
+  41            * @param  Data 8位位选，从上往下，范围0x00~0xFF，1为亮，0为灭
+  42            * @retval 无
+  43            */
+  44          void MatrixLED_ShowColumn(unsigned char Column, Data)
+  45          {
+  46   1          // 位选
+  47   1          _74HC595_SendByte(Data);
+  48   1          // 段选
+  49   1          MARTIX_LED_PORT = ~(0x80>>Column);
+  50   1      
+  51   1          // 消影：延时清零
+  52   1          Delay(1);
+  53   1          MARTIX_LED_PORT = 0xFF;
+  54   1      }
+C51 COMPILER V9.60.7.0   MATRIXLED                                                         04/21/2024 15:56:28 PAGE 2   
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     84    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
