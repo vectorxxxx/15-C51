@@ -52,40 +52,51 @@ void EditDateTime()
     FlickerDateTime(TimerSelect,FlickerFlag);
 }
 
+/**
+  * @brief 选择模式
+  * @param  无
+  * @retval 无
+  */
+void SelectMode()
+{
+    KeyNum=Key();
+    
+    // 选择模式
+    if(KeyNum==1)
+    {
+        // 修改为编辑模式
+        if(MODE==0)
+        {
+            MODE=1;
+            TimerSelect=0;
+        }
+        // 修改为显示模式
+        else if(MODE==1)
+        {
+            MODE=0;
+            DS1302_SetDateTime();
+        }
+    }
+    
+    // 显示模式
+    if(MODE==0)
+    {
+        ShowDateTime();
+    }
+    // 编辑模式
+    else if(MODE==1)
+    {
+        EditDateTime();
+    }
+}
+
 void main()
 {
     Init();
     while(1)
     {
-        KeyNum=Key();
-
         // 选择模式
-        if(KeyNum==1)
-        {
-            // 修改为设置模式
-            if(MODE==0)
-            {
-                MODE=1;
-                TimerSelect=0;
-            }
-            // 修改为显示模式
-            else if(MODE==1)
-            {
-                MODE=0;
-                DS1302_SetDateTime();
-            }
-        }
-
-        // 显示模式
-        if(MODE==0)
-        {
-            ShowDateTime();
-        }
-        // 编辑模式
-        else if(MODE==1)
-        {
-            EditDateTime();
-        }
+        SelectMode();
 
 //        LCD_ShowNum(2,10,KeyNum,1);
 //        LCD_ShowNum(2,12,MODE,1);
