@@ -1,0 +1,146 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/25/2024 20:50:39 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "Timer0.h"
+   4          
+   5          // 定义蜂鸣器端口位
+   6          sbit Buzzer=P2^5;
+   7          
+   8          // 定义宏播放速度，值为四分音符的时长(ms)
+   9          #define SPEED   500
+  10          
+  11          // 定义重装载值数组
+  12          unsigned int code ReloadValues[]={
+  13              // 索引是从1开始的，这里空出一位
+  14              0,
+  15              // 低音
+  16              63618,63721,63825,63918,64011,64093,64175,64250,64321,64390,64453,64514,
+  17              // 中音
+  18              64570,64623,64674,64722,64767,64810,64850,64888,64924,64958,64990,65020,
+  19              // 高音
+  20              65048,65075,65100,65124,65147,65168,65188,65207,65225,65242,65258,65273
+  21          };
+  22          
+  23          // 定义小星星数组
+  24          // code 代表的是 把定义的数据表存储到 flash 存储器中，否则存储到 RAM 中
+  25          // 51单片机的 RAM 通常都比较小，1k 左右，对于小量的数据是可以存储到RAM中，如
+             -果是声音文件等大数据需要存储到 FLASH 存储器中
+  26          unsigned char code TwinkleTwinkleLittleStar[]={
+  27              // 一闪一闪亮晶晶
+  28              13,4,
+  29              13,4,
+  30              20,4,
+  31              20,4,
+  32              22,4,
+  33              22,4,
+  34              20,4+4,
+  35              // 满天都是小星星
+  36              18,4,
+  37              18,4,
+  38              16,4,
+  39              16,4,
+  40              15,4,
+  41              15,4,
+  42              13,4+4,
+  43              // 终止符测试
+  44              0,4,
+  45              // 挂在天上放光明
+  46              20,4,
+  47              20,4,
+  48              18,4,
+  49              18,4,
+  50              16,4,
+  51              16,4,
+  52              15,4+4,
+  53              // 好像许多小眼睛
+C51 COMPILER V9.60.7.0   MAIN                                                              04/25/2024 20:50:39 PAGE 2   
+
+  54              20,4,
+  55              20,4,
+  56              18,4,
+  57              18,4,
+  58              16,4,
+  59              16,4,
+  60              15,4+4,
+  61              // 结束标记
+  62              0xFF
+  63          };
+  64          
+  65          // 定义数组索引等
+  66          unsigned char ReloadValues_Index, TwinkleTwinkleLittleStar_Index, DurationBasics;
+  67          
+  68          void main()
+  69          {
+  70   1          Timer0_Init();
+  71   1          while(1)
+  72   1          {
+  73   2              if (ReloadValues_Index != 0xFF)
+  74   2              {
+  75   3                  // 选择音符对应的频率
+  76   3                  ReloadValues_Index = TwinkleTwinkleLittleStar[TwinkleTwinkleLittleStar_Index];  // 重载值�
+             -�引
+  77   3                  TwinkleTwinkleLittleStar_Index++;
+  78   3                  // 选择音符对应的时值
+  79   3                  DurationBasics = TwinkleTwinkleLittleStar[TwinkleTwinkleLittleStar_Index];      // 时长基�
+             -�
+  80   3                  TwinkleTwinkleLittleStar_Index++;
+  81   3                  Delay(SPEED / 4 * DurationBasics);
+  82   3                  
+  83   3                  // 音符间短暂停顿
+  84   3                  TR0 = 0;
+  85   3                  Delay(5);
+  86   3                  TR0 = 1;
+  87   3              }
+  88   2              else
+  89   2              {
+  90   3                  TR0 = 0;
+  91   3                  while(1);
+  92   3              }
+  93   2          }
+  94   1      }
+  95          
+  96          /**
+  97            * @brief 定时器0终端执行程序
+  98            * @param  无
+  99            * @retval 无
+ 100            */
+ 101          void Timer0_Routine() interrupt 1
+ 102          {
+ 103   1          unsigned int ReloadValue = ReloadValues[ReloadValues_Index];
+ 104   1          
+ 105   1          // 如果不是休止符
+ 106   1          if (ReloadValue)
+ 107   1          {
+ 108   2              TL0 = ReloadValue%256;
+ 109   2              TH0 = ReloadValue/256;
+ 110   2              
+ 111   2              // 翻转蜂鸣器IO口
+ 112   2              Buzzer=!Buzzer;
+ 113   2          }
+C51 COMPILER V9.60.7.0   MAIN                                                              04/25/2024 20:50:39 PAGE 3   
+
+ 114   1          
+ 115   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    115    ----
+   CONSTANT SIZE    =    133    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

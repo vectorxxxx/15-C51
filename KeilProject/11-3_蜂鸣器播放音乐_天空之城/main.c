@@ -1,0 +1,286 @@
+#include <REGX52.H>
+#include "Delay.h"
+#include "Timer0.h"
+
+// 定义蜂鸣器端口位
+sbit Buzzer=P2^5;
+
+// 定义宏播放速度，值为四分音符的时长(ms)
+#define SPEED   500
+
+// 音符与索引对应表
+//      P：休止符
+//      L：低音
+//      M：中音
+//      H：高音
+//      _：升半音符号#
+#define P	0
+#define L1	1
+#define L1_	2
+#define L2	3
+#define L2_	4
+#define L3	5
+#define L4	6
+#define L4_	7
+#define L5	8
+#define L5_	9
+#define L6	10
+#define L6_	11
+#define L7	12
+#define M1	13
+#define M1_	14
+#define M2	15
+#define M2_	16
+#define M3	17
+#define M4	18
+#define M4_	19
+#define M5	20
+#define M5_	21
+#define M6	22
+#define M6_	23
+#define M7	24
+#define H1	25
+#define H1_	26
+#define H2	27
+#define H2_	28
+#define H3	29
+#define H4	30
+#define H4_	31
+#define H5	32
+#define H5_	33
+#define H6	34
+#define H6_	35
+#define H7	36
+
+// 索引与频率对照表
+unsigned int code ReloadValues[]={ // 定义重装载值数组
+    // 索引是从1开始的，这里空出一位
+    0,
+    // 低音
+    63618,63721,63825,63918,64011,64093,64175,64250,64321,64390,64453,64514,
+    // 中音
+    64570,64623,64674,64722,64767,64810,64850,64888,64924,64958,64990,65020,
+    // 高音
+    65048,65075,65100,65124,65147,65168,65188,65207,65225,65242,65258,65273
+};
+
+// 定义乐谱音符和时值
+unsigned char code Music[]={
+    // ======1======
+    P,4,
+    P,4,
+    P,4,
+    M6,2,
+    M7,2,
+    
+    H1,4+2,
+    M7,2,
+    H1,4,
+    H3,4,
+    
+    M7,4+4+4,
+    M3,2,
+    M3,2,
+    
+    // ======2======
+    M6,4+2,
+    M5,2,
+    M6,4,
+    H1,4,
+    
+    M5,4+4+4,
+    M3,4,
+    
+    M4,4+2,
+    M3,2,
+    M4,4,
+    H1,4,
+    
+    // ======3======
+    M3,4+4,
+    P,2,
+    H1,2,
+    H1,2,
+    H1,2,
+    
+    M7,4+2,
+    M4_,2,
+    M4_,4,  // 前面Fa升了，本小节的Fa都要升
+    M7,4,
+    
+    M7,4+4,
+    P,4,
+    M6,2,
+    M7,2,
+    
+    // ======4======
+    H1,4+2,
+    M7,2,
+    H1,4,
+    H3,4,
+    
+    M7,4+4+4,
+    M3,2,
+    M3,2,
+    
+    M6,4+2,
+    M5,2,
+    M6,4,
+    H1,4,
+    
+    // ======5======
+    M5,4+4+4,
+    M2,2,
+    M3,2,
+    
+    M4,4,
+    H1,2,
+    M7,2+2,
+    H1,2+4,
+    
+    H2,2,
+    H2,2,
+    H3,2,
+    H1,2+4+4,
+    
+    // ======6======
+    H1,2,
+    M7,2,
+    M6,2,
+    M6,2,
+    M7,4,
+    M5_,4,
+    
+    M6,4+4+4,
+    H1,2,
+    H2,2,
+    
+    H3,4+2,
+    H2,2,
+    H3,4,
+    H5,4,
+    
+    // ======7======
+    H2,4+4+4,
+    M5,2,
+    M5,2,
+    
+    H1,4+2,
+    M7,2,
+    H1,4,
+    H3,4,
+    
+    H3,4+4+4+4,
+    
+    // ======8======
+    M6,2,
+    M7,2,
+    H1,4,
+    M7,4,
+    H2,2,
+    H2,2,
+    
+    H1,4+2,
+    M5,2+4+4,
+    
+    H4,4,
+    H3,4,
+    H2,4,
+    H1,4,
+    
+    // ======9======
+    H3,4+4+4,
+    H3,4,
+    
+    H6,4+4,
+    H5,4,
+    H5,4,
+    
+    H3,2,
+    H2,2,
+    H1,4+4,
+    P,2,
+    H1,2,
+    
+    // ======10======
+    H2,4,
+    H1,2,
+    H2,2,
+    H2,4,
+    H5,4,
+    
+    H3,4+4+4,
+    H3,4,
+    
+    H6,4+4,
+    H5,4+4,
+    
+    // ======11======
+    H3,2,
+    H2,2,
+    H1,4+4,
+    P,2,
+    H1,2,
+    
+    H2,4,
+    H1,2,
+    H2,2+4,
+    M7,4,
+    
+    M6,4+4+4,
+    P,4,
+    
+    // 终止标志
+    0xFF
+};
+
+// 定义数组索引等
+unsigned char ReloadValues_Index, Music_Index, DurationBasics;
+
+void main()
+{
+    Timer0_Init();
+    while(1)
+    {
+        if (ReloadValues_Index != 0xFF)
+        {
+            // 选择音符对应的频率
+            ReloadValues_Index = Music[Music_Index];  // 重载值索引
+            Music_Index++;
+            // 选择音符对应的时值
+            DurationBasics = Music[Music_Index];      // 时长基数
+            Music_Index++;
+            Delay(SPEED / 4 * DurationBasics);
+            
+            // 音符间短暂停顿
+            TR0 = 0;
+            Delay(5);
+            TR0 = 1;
+        }
+        else
+        {
+            TR0 = 0;
+            while(1);
+        }
+    }
+}
+
+/**
+  * @brief 定时器0终端执行程序
+  * @param  无
+  * @retval 无
+  */
+void Timer0_Routine() interrupt 1
+{
+    unsigned int ReloadValue = ReloadValues[ReloadValues_Index];
+    
+    // 如果不是休止符
+    if (ReloadValue)
+    {
+        TL0 = ReloadValue%256;
+        TH0 = ReloadValue/256;
+        
+        // 翻转蜂鸣器IO口
+        Buzzer=!Buzzer;
+    }
+}
