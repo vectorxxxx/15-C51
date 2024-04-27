@@ -1,0 +1,127 @@
+C51 COMPILER V9.60.7.0   I2C                                                               04/27/2024 16:10:26 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\Objects\I2C.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE I2C.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\I2C.lst) OBJECT(.\Objects\I2C.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          sbit I2C_SCL = P2^1;
+   4          sbit I2C_SDA = P2^0;
+   5          
+   6          /**
+   7            * @brief I2C起始条件：ISCL高电平期间，SDA从高电平切换到低电平
+   8            * @param  无
+   9            * @retval 无
+  10            */
+  11          void I2C_Start()
+  12          {
+  13   1          I2C_SDA=1;
+  14   1          I2C_SCL=1;
+  15   1          I2C_SDA=0;
+  16   1          I2C_SCL=0;
+  17   1      }
+  18          
+  19          /**
+  20            * @brief I2C终止条件：SCL高电平期间，SDA从低电平切换到高电平
+  21            * @param  无
+  22            * @retval 无
+  23            */
+  24          void I2C_Stop()
+  25          {
+  26   1          I2C_SDA=0;
+  27   1          I2C_SCL=1;
+  28   1          I2C_SDA=1;
+  29   1      }
+  30          
+  31          /**
+  32            * @brief 发送一个字节：SCL低电平期间，
+  33                          主机将数据位依次放到SDA线上（高位在前），然后拉高SCL，
+  34                          从机将在SCL高电平期间读取数据位，所以SCL高电平期间SDA不允许有数
+             -据变化，
+  35                          依次循环上述过程8次，即可发送一个字节
+  36            * @param  无
+  37            * @retval 无
+  38            */
+  39          void I2C_SendByte(unsigned char Byte)
+  40          {
+  41   1          unsigned char i;   
+  42   1          for(i=0;i<8;i++)
+  43   1          {
+  44   2              I2C_SDA=Byte&(0x80>>i);
+  45   2              I2C_SCL=1;
+  46   2              I2C_SCL=0;
+  47   2          }
+  48   1      }
+  49          
+  50          /**
+  51            * @brief 接收一个字节：SCL低电平期间，
+  52                          从机将数据位依次放到SDA线上（高位在前），然后拉高SCL，
+  53                          主机将在SCL高电平期间读取数据位，所以SCL高电平期间SDA不允许有数
+C51 COMPILER V9.60.7.0   I2C                                                               04/27/2024 16:10:26 PAGE 2   
+
+             -据变化，
+  54                          依次循环上述过程8次，即可接收一个字节
+  55            * @param  无
+  56            * @retval 无
+  57            */
+  58          unsigned char I2C_ReceiveByte()
+  59          {
+  60   1          unsigned char i,Byte=0x00;
+  61   1          // 主机在接收之前，需要释放SDA
+  62   1          I2C_SDA=1;
+  63   1          for(i=0;i<8;i++)
+  64   1          {
+  65   2              I2C_SCL=1;
+  66   2              if(I2C_SDA){Byte|=(0x80>>i);}
+  67   2              I2C_SCL=0;
+  68   2          }
+  69   1          return Byte;
+  70   1      }
+  71          
+  72          /**
+  73            * @brief 发送应答：在接收完一个字节之后，主机在下一个时钟发送一位数据
+  74            * @param  AckBit 数据0表示应答，数据1表示非应答
+  75            * @retval 无
+  76            */
+  77          void I2C_SendAck(unsigned char AckBit)
+  78          {
+  79   1          I2C_SDA=AckBit;
+  80   1          I2C_SCL=1;
+  81   1          I2C_SCL=0;
+  82   1      }
+  83          
+  84          /**
+  85            * @brief 接收应答：在发送完一个字节之后，主机在下一个时钟接收一位数据，�
+             -�断从机是否应答，
+  86            * @param  数据0表示应答，数据1表示非应答
+  87            * @retval 无
+  88            */
+  89          unsigned char I2C_ReceiveAck()
+  90          {
+  91   1          unsigned char AckBit;
+  92   1          // 主机在接收之前，需要释放SDA
+  93   1          I2C_SDA=1;
+  94   1          I2C_SCL=1;
+  95   1          AckBit=I2C_SDA;
+  96   1          I2C_SCL=0;
+  97   1          return AckBit;
+  98   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    109    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,169 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/27/2024 17:28:39 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "LCD1602.h"
+   4          #include "DS18B20.h"
+   5          #include "AT24C02.h"
+   6          #include "Key.h"
+   7          #include "Timer0.h"
+   8          
+   9          float T,Tmp;
+  10          char THigh,TLow;
+  11          unsigned char KeyNum;
+  12          
+  13          /**
+  14            * @brief 从DS18B20中读取温度并显示
+  15            * @param  无
+  16            * @retval 无
+  17            */
+  18          void ShowT()
+  19          {
+  20   1          DS18B20_ConvertT();     //转换温度
+  21   1          T=DS18B20_ReadT();      //读取温度
+  22   1          
+  23   1          // 正负部分
+  24   1          LCD_ShowChar(1,1,T<0 ? '-' : '+');
+  25   1          Tmp=T<0 ? -T : T;
+  26   1          // 整数部分
+  27   1          LCD_ShowNum(1,2,Tmp,3);
+  28   1          // 小数部分
+  29   1          LCD_ShowNum(1,6,(unsigned long)(Tmp*100)%100,2);   
+  30   1      }
+  31          
+  32          /**
+  33            * @brief 从E2PROM中读取阈值并显示
+  34            * @param  无
+  35            * @retval 无
+  36            */
+  37          void ShowThreshold()
+  38          {
+  39   1          // 读出阈值
+  40   1          THigh=AT24C02_ReadData(0);
+  41   1          TLow=AT24C02_ReadData(1);
+  42   1          if(!THigh) THigh=25;
+  43   1          if(!TLow) TLow=20;
+  44   1          
+  45   1          // 显示阈值
+  46   1          LCD_ShowSignedNum(2,4,THigh,3);
+  47   1          LCD_ShowSignedNum(2,13,TLow,3);
+  48   1      }
+  49          
+  50          /**
+  51            * @brief 显示警报
+  52            * @param  无
+  53            * @retval 无
+  54            */
+C51 COMPILER V9.60.7.0   MAIN                                                              04/27/2024 17:28:39 PAGE 2   
+
+  55          void ShowAlarm()
+  56          {
+  57   1          if(T>=THigh) LCD_ShowString(1,13,"OV:H");
+  58   1          else if(T<=TLow) LCD_ShowString(1,13,"OV:L");
+  59   1          else LCD_ShowString(1,13,"    ");
+  60   1      }
+  61          
+  62          /**
+  63            * @brief 调节温度报警阈值，温度可测量范围为： -55℃至+125℃
+  64            * @param  无
+  65            * @retval 无
+  66            */
+  67          void AdjustThreshold()
+  68          {
+  69   1          KeyNum=Key();
+  70   1          if(!KeyNum) return;
+  71   1          LCD_ShowNum(1,10,KeyNum,1);
+  72   1          
+  73   1          // 调节阈值
+  74   1          if(KeyNum==1 && THigh<125) THigh++;
+  75   1          else if(KeyNum==2 && THigh>TLow+1) THigh--;
+  76   1          else if(KeyNum==3 && TLow<THigh-1) TLow++;
+  77   1          else if(KeyNum==4 && TLow>-55) TLow--;
+  78   1          
+  79   1          // 显示阈值
+  80   1          LCD_ShowSignedNum(2,4,THigh,3);
+  81   1          LCD_ShowSignedNum(2,13,TLow,3);
+  82   1          
+  83   1          // 保存阈值
+  84   1          AT24C02_WriteData(0,THigh);
+  85   1          Delay(5); // 写周期最大值5ms
+  86   1          AT24C02_WriteData(1,TLow);
+  87   1          Delay(5); // 写周期最大值5ms
+  88   1          
+  89   1          // 显示警报
+  90   1          ShowAlarm();
+  91   1      }
+  92          
+  93          void main()
+  94          {    
+  95   1          DS18B20_ConvertT();         // 上电先转换一次温度，防止第一次读数据错误
+  96   1          Delay(1000);                // 转换位数为12位时，最大转换时间为750ms。延迟等待转�
+             -��完成
+  97   1          T=DS18B20_ReadT();          // 读取温度
+  98   1          
+  99   1          Timer0_Init();
+ 100   1          
+ 101   1          LCD_Init();
+ 102   1          LCD_ShowChar(1,5,'.');      // 小数点
+ 103   1          LCD_ShowString(2,1,"TH:");
+ 104   1          LCD_ShowSignedNum(2,4,THigh,3);
+ 105   1          LCD_ShowString(2,10,"TL:");
+ 106   1          LCD_ShowSignedNum(2,13,TLow,3);
+ 107   1      
+ 108   1          ShowThreshold();            // 显示阈值
+ 109   1          ShowAlarm();                // 显示警报
+ 110   1          
+ 111   1          while(1)
+ 112   1          {
+ 113   2              // ######显示温度######
+ 114   2              ShowT();
+ 115   2              
+C51 COMPILER V9.60.7.0   MAIN                                                              04/27/2024 17:28:39 PAGE 3   
+
+ 116   2              // ######调节阈值######
+ 117   2              AdjustThreshold();
+ 118   2          }
+ 119   1      }
+ 120          
+ 121          /**
+ 122            * @brief 定时器0中断程序
+ 123            * @param  无
+ 124            * @retval 无
+ 125            */
+ 126          void Timer0_Routine() interrupt 1
+ 127          {
+ 128   1          static unsigned int Counter;
+ 129   1      
+ 130   1          // 重置定时器初始值
+ 131   1          TL0 = 0x66;
+ 132   1          TH0 = 0xFC;
+ 133   1      
+ 134   1          // 中断1次为1ms
+ 135   1          if(++Counter>=20)
+ 136   1          {
+ 137   2              Counter=0;
+ 138   2              Key_Loop();
+ 139   2          }
+ 140   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    670    ----
+   CONSTANT SIZE    =     23    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

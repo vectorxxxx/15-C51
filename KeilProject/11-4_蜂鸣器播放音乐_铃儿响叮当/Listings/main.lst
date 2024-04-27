@@ -1,0 +1,238 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/26/2024 19:47:54 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "Timer0.h"
+   4          
+   5          // 定义蜂鸣器端口位
+   6          sbit Buzzer=P2^5;
+   7          
+   8          // 定义宏播放速度，值为四分音符的时长(ms)
+   9          #define SPEED   500
+  10          
+  11          // 音符与索引对应表
+  12          //      P：休止符
+  13          //      L：低音
+  14          //      M：中音
+  15          //      H：高音
+  16          //      _：升半音符号#
+  17          #define P       0
+  18          #define L1      1
+  19          #define L1_     2
+  20          #define L2      3
+  21          #define L2_     4
+  22          #define L3      5
+  23          #define L4      6
+  24          #define L4_     7
+  25          #define L5      8
+  26          #define L5_     9
+  27          #define L6      10
+  28          #define L6_     11
+  29          #define L7      12
+  30          #define M1      13
+  31          #define M1_     14
+  32          #define M2      15
+  33          #define M2_     16
+  34          #define M3      17
+  35          #define M4      18
+  36          #define M4_     19
+  37          #define M5      20
+  38          #define M5_     21
+  39          #define M6      22
+  40          #define M6_     23
+  41          #define M7      24
+  42          #define H1      25
+  43          #define H1_     26
+  44          #define H2      27
+  45          #define H2_     28
+  46          #define H3      29
+  47          #define H4      30
+  48          #define H4_     31
+  49          #define H5      32
+  50          #define H5_     33
+  51          #define H6      34
+  52          #define H6_     35
+  53          #define H7      36
+  54          
+C51 COMPILER V9.60.7.0   MAIN                                                              04/26/2024 19:47:54 PAGE 2   
+
+  55          // 索引与频率对照表
+  56          unsigned int code ReloadValues[]={ // 定义重装载值数组
+  57              // 索引是从1开始的，这里空出一位
+  58              0,
+  59              // 低音
+  60              63618,63721,63825,63918,64011,64093,64175,64250,64321,64390,64453,64514,
+  61              // 中音
+  62              64570,64623,64674,64722,64767,64810,64850,64888,64924,64958,64990,65020,
+  63              // 高音
+  64              65048,65075,65100,65124,65147,65168,65188,65207,65225,65242,65258,65273
+  65          };
+  66          
+  67          // 定义乐谱音符和时值
+  68          unsigned char code Music[]={
+  69              // ======1======
+  70              M3,2,
+  71              M3,2,
+  72              M3,4,
+  73          
+  74              M3,2,
+  75              M3,2,
+  76              M3,4,
+  77              
+  78              M3,2,
+  79              M5,2,
+  80              M1,2+1,
+  81              M2,1,
+  82              
+  83              M3,4+4,
+  84              
+  85              M4,2,
+  86              M4,2,
+  87              M4,2+1,
+  88              M4,1,
+  89              
+  90              // ======2======
+  91              M4,2,
+  92              M3,2,
+  93              M3,2,
+  94              M3,1,
+  95              M3,1,
+  96              
+  97              M3,2,
+  98              M2,2,
+  99              M2,2,
+ 100              M1,2,
+ 101              
+ 102              M2,4,
+ 103              M5,4,
+ 104              
+ 105              M5,2,
+ 106              M5,2,
+ 107              M4,2,
+ 108              M2,2,
+ 109              
+ 110              M1,4+2,
+ 111              L5,2,
+ 112              
+ 113              // ======3======
+ 114              L5,2,
+ 115              M3,2,
+ 116              M2,2,
+C51 COMPILER V9.60.7.0   MAIN                                                              04/26/2024 19:47:54 PAGE 3   
+
+ 117              M1,2,
+ 118              
+ 119              L5,4+2,
+ 120              L5,2,
+ 121              
+ 122              L5,2,
+ 123              L3,2,
+ 124              M2,2,
+ 125              M1,2,
+ 126              
+ 127              L6,4+2,
+ 128              L6,2,
+ 129              
+ 130              L6,2,
+ 131              M4,2,
+ 132              M3,2,
+ 133              M2,2,
+ 134          
+ 135              // ======4======
+ 136              L7,4+2,
+ 137              L5,2,
+ 138              
+ 139              M5,2,
+ 140              M5,2,
+ 141              M4,2,
+ 142              M5,2,
+ 143              
+ 144              M3,4,
+ 145              M1,2,
+ 146              L5,2,
+ 147              
+ 148              L5,2,
+ 149              M3,2,
+ 150              M2,2,
+ 151              M1,2,
+ 152              
+ 153              L5,4+4,
+ 154          
+ 155              // 终止标志
+ 156              0xFF
+ 157          };
+ 158          
+ 159          // 定义数组索引等
+ 160          unsigned char ReloadValues_Index, Music_Index, DurationBasics;
+ 161          
+ 162          void main()
+ 163          {
+ 164   1          Timer0_Init();
+ 165   1          while(1)
+ 166   1          {
+ 167   2              if (ReloadValues_Index != 0xFF)
+ 168   2              {
+ 169   3                  // 选择音符对应的频率
+ 170   3                  ReloadValues_Index = Music[Music_Index];  // 重载值索引
+ 171   3                  Music_Index++;
+ 172   3                  // 选择音符对应的时值
+ 173   3                  DurationBasics = Music[Music_Index];      // 时长基数
+ 174   3                  Music_Index++;
+ 175   3                  Delay(SPEED / 4 * DurationBasics);
+ 176   3                  
+ 177   3                  // 音符间短暂停顿
+ 178   3                  TR0 = 0;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/26/2024 19:47:54 PAGE 4   
+
+ 179   3                  Delay(5);
+ 180   3                  TR0 = 1;
+ 181   3              }
+ 182   2              else
+ 183   2              {
+ 184   3                  TR0 = 0;
+ 185   3                  while(1);
+ 186   3              }
+ 187   2          }
+ 188   1      }
+ 189          
+ 190          /**
+ 191            * @brief 定时器0终端执行程序
+ 192            * @param  无
+ 193            * @retval 无
+ 194            */
+ 195          void Timer0_Routine() interrupt 1
+ 196          {
+ 197   1          unsigned int ReloadValue = ReloadValues[ReloadValues_Index];
+ 198   1          
+ 199   1          // 如果不是休止符
+ 200   1          if (ReloadValue)
+ 201   1          {
+ 202   2              TL0 = ReloadValue%256;
+ 203   2              TH0 = ReloadValue/256;
+ 204   2              
+ 205   2              // 翻转蜂鸣器IO口
+ 206   2              Buzzer=!Buzzer;
+ 207   2          }
+ 208   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    115    ----
+   CONSTANT SIZE    =    199    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
