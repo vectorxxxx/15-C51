@@ -1,0 +1,44 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/28/2024 22:47:39 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          
+   4          void main()
+   5          {
+   6   1          LCD1602_Init();
+   7   1          LCD1602_ShowChar(1,1,'S');
+   8   1          LCD1602_ShowChar(1,2,'B');
+   9   1          LCD1602_ShowStr(1,4,"Fuck");
+  10   1          LCD1602_ShowNum(1,9,567,3);
+  11   1          LCD1602_ShowSignedNum(1,13,-895,3);
+  12   1          LCD1602_ShowHexNum(2,1,0x5A,2);
+  13   1          LCD1602_ShowBinNum(2,4,0x5A,8);
+  14   1          LCD1602_ShowChar(2,13,0xDF);
+  15   1          LCD1602_ShowChar(2,14,'C');
+  16   1          while(1)
+  17   1          {
+  18   2                     
+  19   2          }
+  20   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    110    ----
+   CONSTANT SIZE    =      5    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

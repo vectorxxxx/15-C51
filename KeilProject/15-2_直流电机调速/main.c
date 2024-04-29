@@ -1,0 +1,68 @@
+#include <REGX52.H>
+#include "Delay.h"
+#include "Key.h"
+#include "Timer0.h"
+#include "Nixie.h"
+
+// LED灯引脚定义
+sbit LED=P2^0;
+// 电机引脚定义
+sbit Motor=P1^0;
+
+// PWM模型：计数器、比较值
+unsigned char Counter,Compare;
+// 键码
+unsigned char KeyNum;
+// 速度档位
+unsigned char Speed;
+
+void main()
+{
+    Timer0_Init();
+    Nixie(1,Speed);
+    while(1)
+    {
+        KeyNum=Key();
+        if(KeyNum==1)
+        {
+            // 0,1~3档
+            Speed++;
+            Speed%=4;
+            
+            // 速度档位与比较值对应关系，速度档位决定占空比
+            if(Speed==0) Compare=0;
+            else if(Speed==1) Compare=50;
+            else if(Speed==2) Compare=75;
+            else if(Speed==3) Compare=100;
+            
+            // 显示速度档位
+            Nixie(1,Speed);
+        }
+        
+    }
+}
+
+void Timer0_Routine() interrupt 1
+{
+    static unsigned int Counter;
+    
+    // 重置定时器初始值
+	TL0 = 0xA4;				//设置定时初始值
+	TH0 = 0xFF;				//设置定时初始值
+
+    // 中断1次为100us，100次即10ms
+    Counter++;
+    Counter%=100;
+    
+    // PWM输出
+    if(Counter<Compare)
+    {
+        LED=0;   //LED亮为0，灭为1
+        Motor=1; //电机转动为1，停止为0
+    }
+    else
+    {
+        LED=1;   //LED亮为0，灭为1
+        Motor=0; //电机转动为1，停止为0
+    }
+}
