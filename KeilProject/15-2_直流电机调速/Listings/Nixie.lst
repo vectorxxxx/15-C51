@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   NIXIE                                                             04/29/2024 20:39:20 PAGE 1   
+C51 COMPILER V9.60.7.0   NIXIE                                                             05/02/2024 00:19:49 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE NIXIE
@@ -40,11 +40,14 @@ line level    source
   30   2              }
   31   1      
   32   1              P0=NixieTable[Number];
-  33   1      }
+  33   1              // 清零
+  34   1              Delay(1);
+  35   1              P=0x00;
+  36   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     99    ----
+   CODE SIZE        =    108    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

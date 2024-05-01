@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   MAIN                                                              04/29/2024 20:48:27 PAGE 1   
+C51 COMPILER V9.60.7.0   MAIN                                                              05/02/2024 00:19:49 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
@@ -62,19 +62,19 @@ line level    source
   52   1      
   53   1          // 中断1次为100us，100次即10ms
   54   1          Counter++;
-C51 COMPILER V9.60.7.0   MAIN                                                              04/29/2024 20:48:27 PAGE 2   
+C51 COMPILER V9.60.7.0   MAIN                                                              05/02/2024 00:19:49 PAGE 2   
 
   55   1          Counter%=100;
   56   1          
   57   1          // PWM输出
   58   1          if(Counter<Compare)
   59   1          {
-  60   2              LED=0; //LED亮为0，灭为1
+  60   2              LED=0;   //LED亮为0，灭为1
   61   2              Motor=1; //电机转动为1，停止为0
   62   2          }
   63   1          else
   64   1          {
-  65   2              LED=1; //LED亮为0，灭为1
+  65   2              LED=1;   //LED亮为0，灭为1
   66   2              Motor=0; //电机转动为1，停止为0
   67   2          }
   68   1      }

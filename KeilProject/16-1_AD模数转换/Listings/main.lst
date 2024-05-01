@@ -1,0 +1,72 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/30/2024 22:38:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "Key.h"
+   4          #include "XPT2046.h"
+   5          #include "Delay.h"
+   6          
+   7          unsigned int ADValue;
+   8          unsigned char Resolution=8;
+   9          unsigned char KeyNum;
+  10          
+  11          void main()
+  12          {
+  13   1          LCD_Init();
+  14   1          LCD_ShowString(1,1,"ADJ");  // Adjustable
+  15   1          LCD_ShowString(1,6,"NTC");  // Negative Temperature Coefficient（负温度系数）热敏电阻
+  16   1          LCD_ShowString(1,11,"GR");  
+  17   1          LCD_ShowNum(1,15,Resolution,2);
+  18   1          while(1)
+  19   1          {
+  20   2              // 按键切换分辨率
+  21   2              KeyNum=Key();
+  22   2              if(KeyNum==1) 
+  23   2              {
+  24   3                  if(Resolution==8) 
+  25   3                  {
+  26   4                      Resolution=12;
+  27   4                  }
+  28   3                  else if(Resolution==12) 
+  29   3                  {
+  30   4                      Resolution=8;
+  31   4                  }
+  32   3                  LCD_ShowNum(1,15,Resolution,2);
+  33   3              }
+  34   2                  
+  35   2              // 读取AIN0，可调电阻
+  36   2              ADValue=XPT2046_ReadAD(XPT2046_XP,Resolution);      
+  37   2              LCD_ShowNum(2,1,ADValue,4);
+  38   2              // 读取AIN1，热敏电阻
+  39   2              ADValue=XPT2046_ReadAD(XPT2046_YP,Resolution);      
+  40   2              LCD_ShowNum(2,6,ADValue,4);
+  41   2              // 读取AIN2，光敏电阻
+  42   2              ADValue=XPT2046_ReadAD(XPT2046_VBAT,Resolution);    
+  43   2              LCD_ShowNum(2,11,ADValue,4);
+  44   2              Delay(200);
+  45   2          }
+  46   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    185    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+C51 COMPILER V9.60.7.0   MAIN                                                              04/30/2024 22:38:32 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

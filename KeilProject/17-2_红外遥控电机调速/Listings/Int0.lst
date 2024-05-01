@@ -1,0 +1,63 @@
+C51 COMPILER V9.60.7.0   INT0                                                              05/02/2024 00:32:08 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE INT0
+OBJECT MODULE PLACED IN .\Objects\Int0.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE Int0.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\Int0.lst) OBJECT(.\Objects\Int0.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          /**
+   4            * @brief 外部中断初始化
+   5            * @param  无
+   6            * @retval 无
+   7            */
+   8          void Int0_Init(void)
+   9          {
+  10   1          // TCON（定时器控制寄存器，可位寻址）
+  11   1          // IT0=1——下降沿触发；IT0=0——低电平触发；
+  12   1          IT0=1;
+  13   1          // IE0（中断请求标志位）
+  14   1          IE0=0;
+  15   1          
+  16   1          // IE（中断允许寄存器，可位寻址）
+  17   1          // EX0（中断允许控制位）：EX0=1，允许中断；EX0=0，禁止中断。
+  18   1          EX0=1;
+  19   1          // EA（CPU的总中断允许控制位）：EA=1,CPU开放中断，EA=O,CPU屏蔽所有的中断
+  20   1          EA=1;
+  21   1          
+  22   1          // IP（中断优先级控制寄存器，可位寻址）
+  23   1          // PX0H,PX0（外部中断0优先级控制位）
+  24   1          // 当PX0H=0且PX0=0时，外部中断0为最低优先级中断(优先级0)
+  25   1          // 当PX0H=0且PX0=1时，外部中断0为较低优先级中断(优先级1)
+  26   1          // 当PX0H=1且PX0=0时，外部中断0为较高优先级中断(优先级2)
+  27   1          // 当PX0H=1且PX0=1时，外部中断0为最高优先级中断(优先级3)
+  28   1          PX0=1;
+  29   1      }
+  30          
+  31          /**
+  32            * @brief 外部中断0终端执行程序
+  33            * @param  无
+  34            * @retval 无
+  35            */
+  36          //void Int0_Routine(void)     interrupt 0
+  37          //{
+  38          //    
+  39          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     11    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,79 @@
+C51 COMPILER V9.60.7.0   TIMER0                                                            05/01/2024 22:47:14 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIMER0
+OBJECT MODULE PLACED IN .\Objects\Timer0.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE Timer0.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Li
+                    -stings\Timer0.lst) OBJECT(.\Objects\Timer0.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          /**
+   4           * @brief 定时器0初始化，1毫秒@11.0592MHz
+   5           * @param  无
+   6           * @retval 无
+   7           */
+   8          void Timer0_Init(void)
+   9          {
+  10   1          // 1、设置定时器/计数器工作模式寄存器TMOD
+  11   1          //      0 1   16位定时器/计数器，TL0、TH0全用
+  12   1          TMOD &= 0xF0; // 高4位不变，低4位清零
+  13   1          TMOD |= 0x01; // 高4位不变，低4位置一
+  14   1      
+  15   1          // 2、设置定时器0初始值
+  16   1          TL0 = 0; // Timer Low  0（8bit）
+  17   1          TH0 = 0; // Timer High 0（8bit）
+  18   1      
+  19   1          // 3、定时器/计数器0控制寄存器TCON
+  20   1          TF0 = 0; // 定时器0溢出中断标志置0
+  21   1          TR0 = 0; // 定时器0的运行控制位置0
+  22   1      }
+  23          
+  24          /**
+  25            * @brief 设置计数
+  26            * @param  Counter 计数器范围，0~65535
+  27            * @retval 无
+  28            */
+  29          void Timer0_SetCounter(unsigned int Counter)
+  30          {
+  31   1          TL0=Counter%256;
+  32   1          TH0=Counter/256;
+  33   1      }
+  34          
+  35          /**
+  36            * @brief 获取计数
+  37            * @param  无
+  38            * @retval Counter 计数器范围，0~65535
+  39            */
+  40          unsigned int Timer0_GetCounter()
+  41          {
+  42   1          return (TH0<<8)|TL0;
+  43   1      }
+  44          
+  45          /**
+  46            * @brief 控制运行定时器0
+  47            * @param  无
+  48            * @retval 无
+  49            */
+  50          void Timer0_Run(unsigned char Flag)
+  51          {
+  52   1          TR0 = Flag;
+  53   1      }
+
+C51 COMPILER V9.60.7.0   TIMER0                                                            05/01/2024 22:47:14 PAGE 2   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     38    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

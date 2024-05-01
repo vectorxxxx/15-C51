@@ -1,0 +1,71 @@
+C51 COMPILER V9.60.7.0   TIMER1                                                            05/02/2024 01:26:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIMER1
+OBJECT MODULE PLACED IN .\Objects\Timer1.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE Timer1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Li
+                    -stings\Timer1.lst) OBJECT(.\Objects\Timer1.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          /**
+   4            * @brief 定时器1初始化，1毫秒@11.0592MHz
+   5            * @param  无
+   6            * @retval 无
+   7            */
+   8          void Timer1_Init(void)
+   9          {
+  10   1              TMOD &= 0x0F;                   //设置定时器模式
+  11   1              TMOD |= 0x10;                   //设置定时器模式
+  12   1              TL1 = 0xA4;                             //设置定时初始值
+  13   1              TH1 = 0xFF;                             //设置定时初始值
+  14   1              TF1 = 0;                                //清除TF1标志
+  15   1              TR1 = 1;                                //定时器1开始计时
+  16   1          ET1=1;                  // T1的溢出中断允许位
+  17   1          EA=1;                   // CPU的总中断允许控制位
+  18   1          PT1=0;
+  19   1      }
+  20          
+  21          // 定时器1终端执行程序
+  22          //void Int0_Routine(void)     interrupt 0;
+  23          //void Timer0_Rountine(void)  interrupt 1;
+  24          //void Int1_Routine(void)     interrupt 2;
+  25          //void Timer1_Rountine(void)  interrupt 3:
+  26          //void UART_Routine(void)     interrupt 4;
+  27          //void Timer2_Routine(void)   interrupt 5;
+  28          //void Int2_Routine(void)     interrupt 6;
+  29          //void Int3_Routine(void)     interrupt 7;
+  30          //void Timer1_Routine() interrupt 3
+  31          //{
+  32          //    static unsigned int Counter;
+  33          //    
+  34          //    // 重置定时器初始值
+  35          //      TL1 = 0x66;
+  36          //      TH1 = 0xFC;
+  37          
+  38          //    // 中断1次为1ms，1000次即1s
+  39          //    if(++Counter>=1000)
+  40          //    {
+  41          //        Counter=0;
+  42          //   
+  43          //        // TODO
+  44          //    }
+  45          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     23    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   TIMER1                                                            05/02/2024 01:26:37 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,215 @@
+C51 COMPILER V9.60.7.0   IR                                                                05/02/2024 01:23:20 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE IR
+OBJECT MODULE PLACED IN .\Objects\IR.obj
+COMPILER INVOKED BY: D:\Program\MDK51_32\C51\BIN\C51.EXE IR.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listin
+                    -gs\IR.lst) OBJECT(.\Objects\IR.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Timer0.h"
+   3          #include "Int0.h"
+   4          
+   5          // 定义变量
+   6          unsigned int IR_Time;          // 下降沿间隔时间
+   7          unsigned char IR_State;         // 状态机状态
+   8          
+   9          unsigned char IR_Data[4];       // Data数据临时存储
+  10          unsigned char IR_pData;         // Data数据指针
+  11          
+  12          unsigned char IR_DataFlag;      // Data状态
+  13          unsigned char IR_RepeatFlag;    // Repeat状态
+  14          
+  15          unsigned char IR_Address;       // 地址码
+  16          unsigned char IR_Command;       // 命令码
+  17          
+  18          /**
+  19            * @brief 红外遥控初始化
+  20            * @param  无
+  21            * @retval 无
+  22            */
+  23          void IR_Init(void)
+  24          {
+  25   1          Timer0_Init();
+  26   1          Int0_Init();
+  27   1      }
+  28          
+  29          /**
+  30            * @brief 获取红外接收器收到的数据帧标志位
+  31            * @param  无
+  32            * @retval 是否收到数据帧，1为收到，0为未收到
+  33            */
+  34          unsigned char IR_GetDataFlag(void)
+  35          {
+  36   1          unsigned char Tmp=IR_DataFlag;
+  37   1          if(IR_DataFlag)IR_DataFlag=0;
+  38   1          return Tmp;
+  39   1      }
+  40          
+  41          /**
+  42            * @brief 获取红外接收器收到的连发帧标志位
+  43            * @param  无
+  44            * @retval 是否收到连发帧，1为收到，0为未收到
+  45            */
+  46          unsigned char IR_GetRepeatFlag(void)
+  47          {
+  48   1          unsigned char Tmp=IR_RepeatFlag;
+  49   1          if(IR_RepeatFlag)IR_RepeatFlag=0;
+  50   1          return Tmp;
+  51   1      }
+  52          
+  53          /**
+  54            * @brief 获取红外接收器收到的地址码
+C51 COMPILER V9.60.7.0   IR                                                                05/02/2024 01:23:20 PAGE 2   
+
+  55            * @param  无
+  56            * @retval 收到的地址码
+  57            */
+  58          unsigned char IR_GetAddress(void)
+  59          {
+  60   1          return IR_Address;
+  61   1      }
+  62          
+  63          /**
+  64            * @brief 红外遥控获取收到的命令码
+  65            * @param  无
+  66            * @retval 收到的命令码
+  67            */
+  68          unsigned char IR_GetCommand(void)
+  69          {
+  70   1          return IR_Command;
+  71   1      }
+  72          
+  73          /**
+  74            * @brief 初始化准备
+  75            * @param  无
+  76            * @retval 无
+  77            */
+  78          void IR_Prepare(void)
+  79          {
+  80   1          Timer0_SetCounter(0);
+  81   1          Timer0_Run(1);
+  82   1          IR_State=1;
+  83   1      }
+  84          
+  85          /**
+  86            * @brief 开始/重复标记
+  87            * @param  无
+  88            * @retval 无
+  89            */
+  90          void IR_StartRepeat(void)
+  91          {
+  92   1          IR_Time=Timer0_GetCounter();
+  93   1          Timer0_SetCounter(0);  // 获取到下降沿之间的间隔时间后立即清零，以便对下个下�
+             -��沿之间的间隔时间进行计时
+  94   1          
+  95   1          // Start信号：低电平9ms+高电平4.5ms（判定值在 12MHz 晶振下为 13500，在 11.0592MHz 
+             -晶振下为 12442）
+  96   1          if(IR_Time>13500*(11.0592/12)-500 && IR_Time<13500*(11.0592/12)+500)
+  97   1          {
+  98   2              IR_State=2;
+  99   2          }
+ 100   1          // Repeat信号：低电平9ms+高电平2.25ms（判定值在 12MHz 晶振下为 11250，在 11.0592MH
+             -z 晶振下为 10368）
+ 101   1          else if(IR_Time>11250*(11.0592/12)-500 && IR_Time<11250*(11.0592/12)+500)
+ 102   1          {
+ 103   2              IR_RepeatFlag=1;
+ 104   2              // 重复指令无需进行后续的读取数据操作，直接从上一次数据中读取
+ 105   2              // 停止定时器，并将状态置为初始状态，等待下一次外部中断重新开始
+ 106   2              Timer0_Run(0);
+ 107   2              IR_State=0; 
+ 108   2          }
+ 109   1          else 
+ 110   1          {
+ 111   2              IR_State=1; 
+ 112   2          }
+ 113   1      
+C51 COMPILER V9.60.7.0   IR                                                                05/02/2024 01:23:20 PAGE 3   
+
+ 114   1      }
+ 115          
+ 116          /**
+ 117            * @brief 读取数据
+ 118            * @param  无
+ 119            * @retval 无
+ 120            */
+ 121          void IR_ReadData(void)
+ 122          {
+ 123   1          IR_Time=Timer0_GetCounter();
+ 124   1          Timer0_SetCounter(0);
+ 125   1          
+ 126   1          // 逻辑0：低电平560us+高电平560us
+ 127   1          if(IR_Time>1120*(11.0592/12)-500 && IR_Time<1120*(11.0592/12)+500)
+ 128   1          {
+ 129   2              IR_Data[IR_pData/8]&=~(0x01<<(IR_pData%8)); // 指针所指位置0
+ 130   2              IR_pData++;
+ 131   2          }
+ 132   1          // 逻辑1：低电平560us+高电平1690us
+ 133   1          else if(IR_Time>2250*(11.0592/12)-500 && IR_Time<2250*(11.0592/12)+500)
+ 134   1          {
+ 135   2              IR_Data[IR_pData/8]|=0x01<<(IR_pData%8);    // 指针所指位置1
+ 136   2              IR_pData++;
+ 137   2          }
+ 138   1          else 
+ 139   1          {
+ 140   2              IR_pData=0;                                 // 指针重置
+ 141   2              IR_State=1;                                 // 数据读取有误，回归Start/Repeat状态
+ 142   2          }
+ 143   1          
+ 144   1          // 读取32位数据后，进行反码校验
+ 145   1          if(IR_pData>=32)
+ 146   1          {
+ 147   2              IR_pData=0;
+ 148   2              if(IR_Data[0]==~IR_Data[1] && IR_Data[2]==~IR_Data[3])
+ 149   2              {
+ 150   3                  IR_Address=IR_Data[0];
+ 151   3                  IR_Command=IR_Data[2];
+ 152   3                  IR_DataFlag=1;
+ 153   3              }
+ 154   2              // 任务结束，关闭定时器，并重置状态
+ 155   2              Timer0_Run(0);
+ 156   2              IR_State=0; 
+ 157   2          }
+ 158   1      }
+ 159          
+ 160          /**
+ 161            * @brief 外部中断0终端执行程序
+ 162            * @param  无
+ 163            * @retval 无
+ 164            */
+ 165          void Int0_Routine(void)     interrupt 0
+ 166          {
+ 167   1          // 0——空闲状态
+ 168   1          if(IR_State==0)
+ 169   1          {
+ 170   2              IR_Prepare();
+ 171   2          }
+ 172   1          // 1——Start/Repeat状态
+ 173   1          else if(IR_State==1)
+ 174   1          {
+ 175   2              IR_StartRepeat();
+C51 COMPILER V9.60.7.0   IR                                                                05/02/2024 01:23:20 PAGE 4   
+
+ 176   2          }
+ 177   1          // 2——Data状态
+ 178   1          else if(IR_State==2)
+ 179   1          {
+ 180   2              IR_ReadData();
+ 181   2          }
+ 182   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    468    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
